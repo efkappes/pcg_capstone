@@ -1,9 +1,62 @@
-{% block content %}
-{% if user.is_authenticated %}
-<h3>Hi {{ user.username }}!</h3>
-<p><a href="{% url 'logout' %}">Logout</a><p>
-{% else %}
-<h3>Hi visitor!</h3>
-<p>You are not logged in. <a href="{% url 'login' %}">Login</a> <a href="{% url 'users:signup' %}">Sign Up</a></p>
-{% endif %}
-{% endblock %}
+<!DOCTYPE html>
+<html lang="en">
+{% load static %}
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GLENN</title>
+</head>
+<body>
+    <header>
+        <div>
+            {% if user.is_authenticated %}
+            <h3>Welcome to the GLENN grocery list app, {{ user.username }}!</h3>
+            <p><a href="{% url 'logout' %}">Logout</a><p>
+            {% else %}
+            <h1>Welcome, visitor!</h1>
+            <p>You are not logged in. <a href="{% url 'login' %}">Login</a> <a href="{% url 'users:signup' %}">Sign Up</a></p>
+            {% endif %}
+        </div>
+    </header>
+    <main>
+        {% csrf_token %}
+        <div id="app">
+            <div>
+                <input type="text" placeholder="Item" v-model="newGroceryItem.item_name">
+                <input type="text" placeholder="Note" v-model="newGroceryItem.item_note">
+                {% comment %} <input type="checkbox" name="usual" v-model="newGroceryItem.usual">
+                <label for="usual">{{ Usual }}</label> {% endcomment %}
+                <button @click="createGroceryItem">Add</button>
+            </div>
+            <ul v-if="Object.keys(grocery_list).length">
+                <div>
+                    <grocery-item
+                        v-for="item in incompleteItems"
+                        :key="item.id"
+                        @toggle="toggleGroceryItem(item)"
+                        :item="item"
+                        @save="saveGroceryItem(item)"
+                        @remove="removeGroceryItem(item)"
+                    ></grocery-item>                
+                </div>
+                <br><hr><br>
+                <div>
+                    <grocery-item
+                        v-for="item in completeItems"
+                        :key="item.id"
+                        @toggle="toggleGroceryItem(item)"
+                        :item="item"
+                        @save="saveGroceryItem(item)"
+                        @remove="removeGroceryItem(item)"
+                    ></grocery-item>                
+                </div>                
+            </ul>
+        </div> 
+    </main>
+    <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
+    <script src="{% static '/app.js' %}"></script>
+</body>
+</html>
+
