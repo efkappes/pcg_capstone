@@ -1,4 +1,5 @@
 from rest_framework import generics, viewsets, permissions
+from django_filters.rest_framework import DjangoFilterBackend
 
 from glenn.models import GroceryList, GroceryListItems
 from .serializers import CurrentGroceryListSerializer, CurrentGroceryListItemsSerializer, CurrentGroceryListAndItemsSerializer, UserSerializer, FavoriteGroceryListSerializer, FavoriteGroceryListItemsSerializer
@@ -18,11 +19,12 @@ class CurrentGroceryListItemsViewSet(viewsets.ModelViewSet):
     queryset = GroceryListItems.objects.all()
     # queryset = GroceryListItems.objects.filter(id)
 
-# ADDED...need to test
 class CurrentGroceryListAndItemsViewSet(viewsets.ModelViewSet):
     serializer_class = CurrentGroceryListAndItemsSerializer
     queryset = GroceryListItems.objects.all()
-    
+    filter_backends = [DjangoFilterBackend]
+    filterset_fields = ['id']
+
     # override base QuerySet to filter GroceryList records on current user
     def get_queryset(self):
         user = self.request.user

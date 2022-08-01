@@ -31,6 +31,13 @@
     <main>
         {% csrf_token %}
         <div id="app">
+            {% comment %} <div>
+                <select v-model, @change(function name(id), display selected option),  name="list_id">
+                    
+                        <option <v-for item in items...value= "{{ item.id }}">{{ item.list_name }}</option>
+                </select>
+                <button @click="loadGroceryList">Get List</button>  don't need this if use @change
+            </div> {% endcomment %}
             <div class="new-list">
                 <input type="text" placeholder="List Name" v-model="newGroceryList.list_name">
                 <button @click="addGroceryList">Create List</button>
@@ -45,17 +52,20 @@
             </div>
             <div class="list">
                 {% comment %} <ul v-if="Object.keys(grocery_list).length"> {% endcomment %}
-                <div v-if="Object.keys(grocery_list).length">
+                <div v-if="Object.keys(data).length">
                     <p>List Name Goes Here</p>
-                    <p>{{ list_name }}</p>
-                    <div>
+                    <p>{{ data.list_name }}</p>
+                </div>
+                {% comment %} <div v-if="Object.keys(grocery_list).length"> {% endcomment %}
+                <div v-if="Object.keys(grocery_list).length">
+                        <div>
                         <grocery-item
                             v-for="item in incompleteItems"
                             :key="item.id"
-                            @toggle="toggleGroceryItem(item)"
+                            @toggle="toggleGroceryItem($event)"
                             :item="item"
-                            @save="saveGroceryItem(item)"
-                            @remove="removeGroceryItem(item)"
+                            @save="saveGroceryItem($event)"
+                            @remove="removeGroceryItem($event)"
                         ></grocery-item>                
                     </div>
                     <br><hr><br>
@@ -63,10 +73,10 @@
                         <grocery-item
                             v-for="item in completeItems"
                             :key="item.id"
-                            @toggle="toggleGroceryItem(item)"
+                            @toggle="toggleGroceryItem($event)"
                             :item="item"
-                            @save="saveGroceryItem(item)"
-                            @remove="removeGroceryItem(item)"
+                            @save="saveGroceryItem($event)"
+                            @remove="removeGroceryItem($event)"
                         ></grocery-item>                
                     </div>                
                     <br><hr><br>

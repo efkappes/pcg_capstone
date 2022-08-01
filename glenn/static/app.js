@@ -8,19 +8,19 @@ Vue.component('grocery-item', {
     template: `
         <li>
             <div v-if="editMode">
-                <input type="text" v-model="item[0].item_name">
-                <input type="text" v-model="item[0].item_note">
+                <input type="text" v-model="item.item_name">
+                <input type="text" v-model="item.item_note">
                 <button @click="saveGroceryItem(item)">Save</button>
             </div>
             <div v-else>
                 <div class='item-row'>
                     <div class='item-row-left'>
-                        <ul>(aisle {{ item[0].aisle }})</ul>
+                        <ul>(aisle {{ item.aisle }})</ul>
                         <ul><input type="checkbox" v-model="item.complete" @click="toggleGroceryItem(item)"></ul>
-                        <ul>{{ item[0].item_name }}</ul>
+                        <ul>{{ item.item_name }}</ul>
                     </div>
                     <div class='item-row-right'>
-                        <ul><em>({{ item[0].item_note }})</em></ul>
+                        <ul><em>({{ item.item_note }})</em></ul>
                         <ul><button @click="editMode=true">Edit</button></ul>
                         <ul><button @click="removeGroceryItem(item)">×</button></ul>
                     </div>
@@ -42,9 +42,6 @@ Vue.component('grocery-item', {
         }
     }
 })
-
-
-//<div v-if (item[0].item_note.length)>
 
 
 // Vue.component('add-favorite-list', {
@@ -94,6 +91,7 @@ const vm = new Vue({
     delimiters: ['[[',']]'],
     data: {
         csrfToken: "",
+        data: [],
         grocery_list: [],
         currentUser: {},    
         item: [],
@@ -112,10 +110,9 @@ const vm = new Vue({
             "item_note": "",
             "complete": false
         },
+        list_id: null,
         list_name: "",
         item_info: []
-        // incompleteItems: [],
-        // completeItems: []
     },
     methods: {
         loadGroceryList: function() {
@@ -124,7 +121,6 @@ const vm = new Vue({
             axios({
                 method: 'get',
                 url: 'api/v1/grocery_list_and_items/'               
-                // url: 'api/v1/grocery_list/'
             }).then(response => {
                 this.grocery_list = response.data
                 console.log(response.data)
@@ -140,22 +136,22 @@ const vm = new Vue({
             }).then(response => this.currentUser = response.data)
         },
         saveGroceryItem: function(item) {
-            // console.log('inside saveGroceryItem , item: ' + item)
-            // console.log('inside saveGroceryItem, item.id: ' + this.item.id)
-            // console.log('inside saveGroceryItem, id: ' + this.id)
+            console.log('inside saveGroceryItem, item: ', item)
             axios({
                 method: 'patch',
-                // url: `api/v1/grocery_list/${item.id}/`,
                 url: `api/v1/grocery_list_items/${item.id}/`,
                 headers: {
                     'X-CSRFToken': this.csrfToken
                 },
                 data: item
                 // data: {
-                //     "list_id": this.list_id,
-                //     "item_name": this.item.item_name,                                    
-                //     "item_note": this.newGroceryItem.item_note,                            
-                //     "complete": this.newGroceryItem.complete                            
+                //     "id": item.id,
+                //     "list_id": item.list_id,
+                //     "item_name": item.item_name,                                    
+                //     "aisle": item.aisle,                            
+                //     "usual": item.usual,                            
+                //     "item_note": item.item_note,                            
+                //     "complete": item.complete                            
                 // }
             }).then(response => {
                 this.loadGroceryList()
@@ -164,7 +160,6 @@ const vm = new Vue({
         removeGroceryItem: function(item) {
             axios({
                 method: 'delete',
-                // url: `api/v1/grocery_list/${item.id}/`,
                 url: `api/v1/grocery_list_items/${item.id}/`,
                 headers: {
                     'X-CSRFToken': this.csrfToken
@@ -174,6 +169,8 @@ const vm = new Vue({
             })
         },
         toggleGroceryItem: function(item) {
+            console.log('inside toggleGroceryItem, item.complete: ' + item.complete)
+            console.log('inside toggleGroceryItem, this.item.complete: ' + this.item.complete)
             item.complete = !item.complete
         },
         addGroceryList: function() {
@@ -198,6 +195,9 @@ const vm = new Vue({
             })            
         },
         addGroceryListItem: function(list_id) {
+            // axios request or read from dictionary to look up aisle info based on item name
+            // then nest the axios post request underneath:
+            // .then(axios({
             axios({
                 method: 'post',
                 url: 'api/v1/grocery_list_items/',
@@ -222,28 +222,25 @@ const vm = new Vue({
                 }
             })            
         }
-        // addGroceryListContent: function() {
-        //     this.addGroceryList()
-        //     this.addGroceryListItems()
-        // }
     },
     computed: {
         incompleteItems: function() {
             console.log('inside incompleteItems')
-            console.log('this.list_id:' + this.list_id)
-            console.log('this.grocery_list.id:' + this.grocery_list.id)
-            console.log('list length' + this.grocery_list.length)
+            console.log('inside incompleteItems, this.list_id:' + this.list_id)
+            console.log('inside incompleteItems, this.id:' + this.id)
 
             let incompleteItems = []
             for (let i=0; i < this.grocery_list.length; i++) {
                 if (this.grocery_list[i].id==this.list_id) {
-                    if (!this.grocery_list[i].completed) {
-                        incompleteItems.push(this.grocery_list[i].item_info)
+                    for (let j=0; j < this.grocery_list[i].item_info.length; j++)  {
+                        if (!this.grocery_list[i].item_info[j].complete) {
+                            // console.log('incomplete grocery item: ', this.grocery_list[i].item_info[j])
+                            incompleteItems.push(this.grocery_list[i].item_info[j])
+                        }
                     }
                 }
             }
             return incompleteItems
-            // return this.incompleteItems
 
             // return this.grocery_list.filter(function(item_info) {
             //     return !item_info.complete
@@ -255,8 +252,11 @@ const vm = new Vue({
             let completeItems = []
             for (let i=0; i < this.grocery_list.length; i++) {
                 if (this.grocery_list[i].id==this.list_id) {
-                    if (this.grocery_list[i].completed) {
-                        completeItems.push(this.grocery_list[i].item_info)
+                    for (let j=0; j < this.grocery_list[i].item_info.length; j++)  {
+                        if (this.grocery_list[i].item_info[j].complete) {
+                            // console.log('completed grocery item: ', this.grocery_list[i].item_info[j])
+                            completeItems.push(this.grocery_list[i].item_info[j])
+                        }
                     }
                 }
             }

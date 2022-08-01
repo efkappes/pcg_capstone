@@ -4,6 +4,11 @@ from django.conf import settings
 
 from glenn.models import GroceryList, GroceryListItems
 
+class NestedGroceryListSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroceryList
+        fields = ('id', 'user_id', 'list_name', 'owner', 'is_current', 'is_favorite', 'store_location_id')
+
 class NestedGroceryListItemsSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroceryListItems
@@ -19,7 +24,6 @@ class CurrentGroceryListItemsSerializer(serializers.ModelSerializer):
         model = GroceryListItems
         fields = ('id', 'list_id', 'item_name', 'aisle', 'usual', 'item_note', 'complete')
 
-#ADDED...need to test
 class CurrentGroceryListAndItemsSerializer(serializers.ModelSerializer):
     # item_info = NestedGroceryListItemsSerializer(many=True, source='grocery_list_items', read_only=False)
     # item_info = NestedGroceryListItemsSerializer(many=True, read_only=False)
@@ -30,9 +34,10 @@ class CurrentGroceryListAndItemsSerializer(serializers.ModelSerializer):
         fields = ('id', 'user_id', 'list_name', 'owner', 'is_current', 'is_favorite', 'store_location_id', 'item_info')
 
 class UserSerializer(serializers.ModelSerializer):
+    list_info = NestedGroceryListSerializer(many=True, source='user_lists', read_only=False)
     class Meta:
         model = get_user_model()
-        fields = ('id', 'username', 'store_location_id', 'store_name', 'store_address_1', 'store_city', 'store_state', 'store_zip')
+        fields = ('id', 'username', 'store_location_id', 'store_name', 'store_address_1', 'store_city', 'store_state', 'store_zip', 'list_info')
 
 class FavoriteGroceryListSerializer(serializers.ModelSerializer):
     item_info = NestedGroceryListItemsSerializer(many=True, source='list_items', read_only=False)

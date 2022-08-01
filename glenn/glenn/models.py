@@ -12,7 +12,7 @@ class GroceryItemReference(models.Model):
         return self.item_name
 
 class GroceryList(models.Model):
-    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, related_name='user_lists', on_delete=models.CASCADE)
     list_name = models.CharField(max_length=200, default='Current List')
     owner = models.BooleanField(default=False)
     is_current = models.BooleanField(default=False)
