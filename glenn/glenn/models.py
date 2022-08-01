@@ -11,8 +11,21 @@ class GroceryItemReference(models.Model):
     def __str__(self):
         return self.item_name
 
-class CurrentGroceryList(models.Model):
+class GroceryList(models.Model):
     user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
+    list_name = models.CharField(max_length=200, default='Current List')
+    owner = models.BooleanField(default=False)
+    is_current = models.BooleanField(default=False)
+    is_favorite = models.BooleanField(default=False)
+    store_location_id = models.IntegerField(null=True, blank=True)
+    create_date_time = models.DateTimeField(auto_now_add=True)
+    update_date_time = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.user_id
+
+class GroceryListItems(models.Model):
+    list_id = models.ForeignKey(GroceryList, related_name='list_items', on_delete=models.CASCADE)
     item_name = models.CharField(max_length=200)
     aisle = models.IntegerField(default=0)
     usual = models.BooleanField(default=False)
@@ -22,8 +35,8 @@ class CurrentGroceryList(models.Model):
     update_date_time = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return self.user_id
-    
+        return self.list_id
+
     # class Meta:
     #     ordering = ['aisle']
 
@@ -39,17 +52,6 @@ class UsualGroceryItem(models.Model):
 
 class UnpurchasedGroceryItem(models.Model):
     user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    item_name = models.CharField(max_length=200)
-    item_note = models.CharField(max_length=200, null=True, blank=True)
-    create_date_time = models.DateTimeField(auto_now_add=True)
-    update_date_time = models.DateTimeField(auto_now=True)
-
-    def __str__(self):
-        return self.user_id
-
-class FavoriteGroceryList(models.Model):
-    user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    list_name = models.CharField(max_length=200)
     item_name = models.CharField(max_length=200)
     item_note = models.CharField(max_length=200, null=True, blank=True)
     create_date_time = models.DateTimeField(auto_now_add=True)

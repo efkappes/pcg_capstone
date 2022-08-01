@@ -4,26 +4,29 @@ Vue.component('grocery-item', {
             editMode: false
         }
     },
-    props: ['item'],
+    props: ['item', 'item_info'],
     template: `
-        <div>
+        <li>
             <div v-if="editMode">
-                <input type="text" v-model="item.item_name">
-                <input type="text" v-model="item.item_note">
+                <input type="text" v-model="item[0].item_name">
+                <input type="text" v-model="item[0].item_note">
                 <button @click="saveGroceryItem(item)">Save</button>
             </div>
             <div v-else>
-                <input type="checkbox" v-model="item.complete" @click="toggleGroceryItem(item)">
-                <div>
-                    <p><em>(aisle {{ item.aisle }})</em></p>
+                <div class='item-row'>
+                    <div class='item-row-left'>
+                        <ul>(aisle {{ item[0].aisle }})</ul>
+                        <ul><input type="checkbox" v-model="item.complete" @click="toggleGroceryItem(item)"></ul>
+                        <ul>{{ item[0].item_name }}</ul>
+                    </div>
+                    <div class='item-row-right'>
+                        <ul><em>({{ item[0].item_note }})</em></ul>
+                        <ul><button @click="editMode=true">Edit</button></ul>
+                        <ul><button @click="removeGroceryItem(item)">×</button></ul>
+                    </div>
                 </div>
-                <p>{{ item.item_name }}</p>
-                <p>{{ item.item_note }}</p>
-                <br>
-                <button @click="editMode=true">Edit</button>
-                <button @click="removeGroceryItem(item)">×</button>
             </div>  
-        </div>
+        </li>
     `,
     methods: {
         saveGroceryItem: function(item) {
@@ -40,6 +43,52 @@ Vue.component('grocery-item', {
     }
 })
 
+
+//<div v-if (item[0].item_note.length)>
+
+
+// Vue.component('add-favorite-list', {
+//     data: function() {
+//         return {
+//             list_name: "",
+//         }
+//     },
+//     props: ['grocery_list'],
+//     template: `
+//         <div>
+//             <input type="text" placeholder="List Name" v-model="list_name">
+//             <button @click="addFaveListContent">Add List to Favorites</button>
+//         </div>
+//     `,
+//     methods: {
+//         addFaveListContent: function() {
+//             this.$emit('add-fave-list', this.grocery_list)
+//         }
+//     }
+// })
+
+
+// Vue.component('favorite-list', {
+//     data: function() {
+//         return {
+//             list_name: "",
+//         }
+//     },
+//     props: ['favorite_list'],
+//     template: `
+//         <div>
+//             <input type="text" placeholder="List Name" v-model="list_name">
+//             <button @click="addFavoriteList">Add List to Favorites</button>
+//         </div>
+//     `,
+//     methods: {
+//         addFavoriteList: function(grocery_list) {
+//             this.$emit('add-fave-list', grocery_list)
+//         }
+//     }
+// })
+
+
 const vm = new Vue({
     el: "#app",
     delimiters: ['[[',']]'],
@@ -48,20 +97,34 @@ const vm = new Vue({
         grocery_list: [],
         currentUser: {},    
         item: [],
-        newGroceryItem: {
+        newGroceryList: {
             "user_id": null,
+            "list_name": "",
+            "owner": null,
+            "is_current": true,
+            "is_favorite": false
+        },
+        newGroceryItem: {
+            "list_id": null,
             "item_name": "",
+            "aisle": 0,
             "usual": false,
             "item_note": "",
             "complete": false
         },
+        list_name: "",
+        item_info: []
+        // incompleteItems: [],
+        // completeItems: []
     },
     methods: {
         loadGroceryList: function() {
             // this.grocery_list = {}
+            console.log('inside loadGroceryList')
             axios({
                 method: 'get',
-                url: 'api/v1/grocery_list/'
+                url: 'api/v1/grocery_list_and_items/'               
+                // url: 'api/v1/grocery_list/'
             }).then(response => {
                 this.grocery_list = response.data
                 console.log(response.data)
@@ -76,40 +139,24 @@ const vm = new Vue({
                 url: '/api/v1/current_user/'
             }).then(response => this.currentUser = response.data)
         },
-        createGroceryItem: function() {
-            axios({
-                method: 'post',
-                url: 'api/v1/grocery_list/',
-                headers: {
-                    'X-CSRFToken': this.csrfToken
-                },
-                data: {
-                    "user_id": this.currentUser.id,
-                    "item_name": this.newGroceryItem.item_name,
-                    "usual": this.newGroceryItem.usual,
-                    "item_note": this.newGroceryItem.item_note,
-                    "complete": this.newGroceryItem.complete
-                }
-                // data: this.newGroceryItem
-            }).then(response => {
-                this.loadGroceryList()
-                this.newGroceryItem = {
-                    "user_id": null,
-                    "item_name": "",
-                    "usual": false,
-                    "item_note": "",
-                    "complete": false
-                }
-            })
-        },
         saveGroceryItem: function(item) {
+            // console.log('inside saveGroceryItem , item: ' + item)
+            // console.log('inside saveGroceryItem, item.id: ' + this.item.id)
+            // console.log('inside saveGroceryItem, id: ' + this.id)
             axios({
                 method: 'patch',
-                url: `api/v1/grocery_list/${item.id}/`,
+                // url: `api/v1/grocery_list/${item.id}/`,
+                url: `api/v1/grocery_list_items/${item.id}/`,
                 headers: {
                     'X-CSRFToken': this.csrfToken
                 },
                 data: item
+                // data: {
+                //     "list_id": this.list_id,
+                //     "item_name": this.item.item_name,                                    
+                //     "item_note": this.newGroceryItem.item_note,                            
+                //     "complete": this.newGroceryItem.complete                            
+                // }
             }).then(response => {
                 this.loadGroceryList()
             })
@@ -117,7 +164,8 @@ const vm = new Vue({
         removeGroceryItem: function(item) {
             axios({
                 method: 'delete',
-                url: `api/v1/grocery_list/${item.id}/`,
+                // url: `api/v1/grocery_list/${item.id}/`,
+                url: `api/v1/grocery_list_items/${item.id}/`,
                 headers: {
                     'X-CSRFToken': this.csrfToken
                 }
@@ -127,24 +175,101 @@ const vm = new Vue({
         },
         toggleGroceryItem: function(item) {
             item.complete = !item.complete
+        },
+        addGroceryList: function() {
+            console.log('inside addGroceryList')
+            axios({
+                method: 'post',
+                url: 'api/v1/grocery_list/',
+                headers: {
+                    'X-CSRFToken': this.csrfToken
+                },
+                data: {
+                    "user_id": this.currentUser.id,
+                    "list_name": this.newGroceryList.list_name,
+                    "owner": this.currentUser.id,
+                    "is_current": this.newGroceryList.is_current,
+                    "is_favorite": this.newGroceryList.is_favorite                
+                }
+            }).then(response => {
+                this.list_id = response.data.id
+                this.list_name = response.data.list_name
+                // this.loadGroceryList()
+            })            
+        },
+        addGroceryListItem: function(list_id) {
+            axios({
+                method: 'post',
+                url: 'api/v1/grocery_list_items/',
+                headers: {
+                    'X-CSRFToken': this.csrfToken
+                },
+                data: {
+                    "list_id": this.list_id,
+                    "item_name": this.newGroceryItem.item_name,                                    
+                    "aisle": this.newGroceryItem.aisle,                            
+                    "usual": this.newGroceryItem.usual,                            
+                    "item_note": this.newGroceryItem.item_note,                            
+                    "complete": this.newGroceryItem.complete                            
+                }
+            }).then(response => {
+                this.loadGroceryList()
+                this.newGroceryItem = {
+                    "item_name": "",
+                    "usual": false,
+                    "item_note": "",
+                    "complete": false
+                }
+            })            
         }
+        // addGroceryListContent: function() {
+        //     this.addGroceryList()
+        //     this.addGroceryListItems()
+        // }
     },
     computed: {
         incompleteItems: function() {
-            return this.grocery_list.filter(function(item) {
-                return !item.complete
-            })
-        },
+            console.log('inside incompleteItems')
+            console.log('this.list_id:' + this.list_id)
+            console.log('this.grocery_list.id:' + this.grocery_list.id)
+            console.log('list length' + this.grocery_list.length)
+
+            let incompleteItems = []
+            for (let i=0; i < this.grocery_list.length; i++) {
+                if (this.grocery_list[i].id==this.list_id) {
+                    if (!this.grocery_list[i].completed) {
+                        incompleteItems.push(this.grocery_list[i].item_info)
+                    }
+                }
+            }
+            return incompleteItems
+            // return this.incompleteItems
+
+            // return this.grocery_list.filter(function(item_info) {
+            //     return !item_info.complete
+            // })
+        }, 
         completeItems: function() {
-            return this.grocery_list.filter(function(item) {
-                return item.complete
-                // text-decoration: line-through
-            })
+            console.log('inside completeItems')
+
+            let completeItems = []
+            for (let i=0; i < this.grocery_list.length; i++) {
+                if (this.grocery_list[i].id==this.list_id) {
+                    if (this.grocery_list[i].completed) {
+                        completeItems.push(this.grocery_list[i].item_info)
+                    }
+                }
+            }
+            return completeItems
+
+            // return this.grocery_list.filter(function(item) {
+            //     return item.complete
+            // })
         }
     }, 
     created: function() {
         this.loadCurrentUser()
-        this.loadGroceryList()
+        // this.loadGroceryList()
     },
     mounted: function() {
         this.csrfToken = document.querySelector("input[name=csrfmiddlewaretoken]").value

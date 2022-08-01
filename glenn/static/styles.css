@@ -1,0 +1,67 @@
+html {
+    box-sizing: border-box;
+}
+
+*, *:before, *:after {
+    box-sizing: inherit;
+}
+
+header {
+    display: flex;
+    justify-content: space-between;
+    /* background-color: #6E8C03; */
+    background-color: #72A603;
+    /* color: whitesmoke; */
+    color: white;
+    /* border: 3px solid #C0D904; */
+    border-radius: 5px;
+    padding: .1em .5em;
+}
+
+body {
+    /* background-color: white; */
+    font-family: 'Poppins', sans-serif;
+    background-color: whitesmoke;
+    border: 3px solid #C0D904;
+    padding: 1em;
+}
+
+.title {
+    display: flex;
+    padding-left: 1em;
+    /* font-size: 20vh; */
+    /* border: 1px solid black; */
+}
+
+/* .item-list {
+    border: 1px solid black; 
+} */
+
+/* .list {
+    border: 1px solid black; 
+} */
+
+.item-row {
+    display: flex;   /* automatically defaults to flex row */
+    justify-content: left;
+    /* border: 1px solid blue; */
+    width: 50vw;    /* 50% of view width */
+}
+
+.item-row-left {
+    display: flex;
+    /* gap: 10px; */
+    justify-content: space-around;
+    /* border: 1px solid green; */
+}
+
+.item-row-right {
+    display: flex;
+    /* gap: 10px;  */
+    justify-content: space-around;
+    /* border: 1px solid orange; */
+}
+
+/* ul {
+    border: 1px solid green;
+} */

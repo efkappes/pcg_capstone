@@ -6,52 +6,95 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>GLENN</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com"> 
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin> 
+    <link href="https://fonts.googleapis.com/css2?family=Poppins&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://necolas.github.io/normalize.css/8.0.1/normalize.css">
+    <link rel="stylesheet" href="../static/styles.css">
 </head>
 <body>
     <header>
-        <div>
+        <div class='title'>
+            <h1>g * list!</h1>
+        </div>
+        <ul>
             {% if user.is_authenticated %}
-            <h3>Welcome to the GLENN grocery list app, {{ user.username }}!</h3>
+            {% comment %} <h3>Welcome to the GLENN grocery list app, {{ user.username }}!</h3> {% endcomment %}
+            <h5>Hello {{ user.username }}!</h5>
             <p><a href="{% url 'logout' %}">Logout</a><p>
             {% else %}
             <h1>Welcome, visitor!</h1>
             <p>You are not logged in. <a href="{% url 'login' %}">Login</a> <a href="{% url 'users:signup' %}">Sign Up</a></p>
             {% endif %}
-        </div>
+        </ul>
     </header>
     <main>
         {% csrf_token %}
         <div id="app">
-            <div>
+            <div class="new-list">
+                <input type="text" placeholder="List Name" v-model="newGroceryList.list_name">
+                <button @click="addGroceryList">Create List</button>
+                {% comment %} <add-new-list @add-new-list="addGroceryList"></add-new-list> {% endcomment %}
+            </div>
+            <div class="add-item">
                 <input type="text" placeholder="Item" v-model="newGroceryItem.item_name">
                 <input type="text" placeholder="Note" v-model="newGroceryItem.item_note">
                 {% comment %} <input type="checkbox" name="usual" v-model="newGroceryItem.usual">
                 <label for="usual">{{ Usual }}</label> {% endcomment %}
-                <button @click="createGroceryItem">Add</button>
+                <button @click="addGroceryListItem">Add Item</button>
             </div>
-            <ul v-if="Object.keys(grocery_list).length">
-                <div>
-                    <grocery-item
-                        v-for="item in incompleteItems"
-                        :key="item.id"
-                        @toggle="toggleGroceryItem(item)"
-                        :item="item"
-                        @save="saveGroceryItem(item)"
-                        @remove="removeGroceryItem(item)"
-                    ></grocery-item>                
+            <div class="list">
+                {% comment %} <ul v-if="Object.keys(grocery_list).length"> {% endcomment %}
+                <div v-if="Object.keys(grocery_list).length">
+                    <p>List Name Goes Here</p>
+                    <p>{{ list_name }}</p>
+                    <div>
+                        <grocery-item
+                            v-for="item in incompleteItems"
+                            :key="item.id"
+                            @toggle="toggleGroceryItem(item)"
+                            :item="item"
+                            @save="saveGroceryItem(item)"
+                            @remove="removeGroceryItem(item)"
+                        ></grocery-item>                
+                    </div>
+                    <br><hr><br>
+                    <div>
+                        <grocery-item
+                            v-for="item in completeItems"
+                            :key="item.id"
+                            @toggle="toggleGroceryItem(item)"
+                            :item="item"
+                            @save="saveGroceryItem(item)"
+                            @remove="removeGroceryItem(item)"
+                        ></grocery-item>                
+                    </div>                
+                    <br><hr><br>
+                    {% comment %} <add-favorite-list @add-fave-list="addFaveListContent(grocery_list)"></add-favorite-list> {% endcomment %}
                 </div>
-                <br><hr><br>
-                <div>
-                    <grocery-item
-                        v-for="item in completeItems"
-                        :key="item.id"
-                        @toggle="toggleGroceryItem(item)"
-                        :item="item"
-                        @save="saveGroceryItem(item)"
-                        @remove="removeGroceryItem(item)"
-                    ></grocery-item>                
-                </div>                
-            </ul>
+            </div> 
+            {% comment %} <div class="favorite-list">
+                <favorite-list
+                    v-for="list in faveLists"
+                    :key="list.id"
+                    @detail="viewFavoriteGroceryItems(list)"
+                ></favorite-list>
+            </div> {% endcomment %}
+
+            {% comment %} <div class="item-list">
+                <div class="item-row">
+                    <ul>Left1</ul>
+                    <ul>Right1</ul>
+                </div>
+                <div class="item-row">
+                    <ul>Left2</ul>
+                    <ul>Right2</ul>
+                </div>
+                <div class="item-row">
+                    <ul>Left3</ul>
+                    <ul>Right3</ul>
+                </div>
+            </div>  {% endcomment %}
         </div> 
     </main>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
