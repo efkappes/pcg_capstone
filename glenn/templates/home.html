@@ -31,13 +31,14 @@
     <main>
         {% csrf_token %}
         <div id="app">
-            {% comment %} <div>
-                <select v-model, @change(function name(id), display selected option),  name="list_id">
-                    
-                        <option <v-for item in items...value= "{{ item.id }}">{{ item.list_name }}</option>
-                </select>
-                <button @click="loadGroceryList">Get List</button>  don't need this if use @change
-            </div> {% endcomment %}
+            <div v-if="Object.keys(list_options).length">
+                <div>
+                    <select v-model="selectedList" @change="loadGroceryList(selectedList)" name="list_id">
+                        <option v-for="option in options" :value="option.id">[[ option.list_name ]]</option>
+                    </select>
+                    {% comment %} <button @click="loadList(selectedList)">Get List</button> {% endcomment %}
+                </div> 
+            </div>
             <div class="new-list">
                 <input type="text" placeholder="List Name" v-model="newGroceryList.list_name">
                 <button @click="addGroceryList">Create List</button>
@@ -52,10 +53,10 @@
             </div>
             <div class="list">
                 {% comment %} <ul v-if="Object.keys(grocery_list).length"> {% endcomment %}
-                <div v-if="Object.keys(data).length">
+                {% comment %} <div v-if="Object.keys(data).length">
                     <p>List Name Goes Here</p>
-                    <p>{{ data.list_name }}</p>
-                </div>
+                    <p>[[ data.list_name ]]</p>
+                </div> {% endcomment %}
                 {% comment %} <div v-if="Object.keys(grocery_list).length"> {% endcomment %}
                 <div v-if="Object.keys(grocery_list).length">
                         <div>

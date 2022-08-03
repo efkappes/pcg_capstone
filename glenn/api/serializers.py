@@ -2,7 +2,14 @@ from rest_framework import serializers
 from django.contrib.auth import get_user_model
 from django.conf import settings
 
-from glenn.models import GroceryList, GroceryListItems
+from glenn.models import GroceryItemReference, GroceryList, GroceryListItems
+
+
+class GroceryItemReferenceSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = GroceryItemReference
+        fields = ('id', 'item_name', 'aisle')
+        # fields = ('id', 'item_name', 'aisle')
 
 class NestedGroceryListSerializer(serializers.ModelSerializer):
     class Meta:

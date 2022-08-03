@@ -1,8 +1,12 @@
 from rest_framework import generics, viewsets, permissions
 from django_filters.rest_framework import DjangoFilterBackend
 
-from glenn.models import GroceryList, GroceryListItems
-from .serializers import CurrentGroceryListSerializer, CurrentGroceryListItemsSerializer, CurrentGroceryListAndItemsSerializer, UserSerializer, FavoriteGroceryListSerializer, FavoriteGroceryListItemsSerializer
+from glenn.models import GroceryList, GroceryListItems, GroceryItemReference
+from .serializers import GroceryItemReferenceSerializer, CurrentGroceryListSerializer, CurrentGroceryListItemsSerializer, CurrentGroceryListAndItemsSerializer, UserSerializer, FavoriteGroceryListSerializer, FavoriteGroceryListItemsSerializer
+
+class GroceryItemReferenceViewSet(viewsets.ModelViewSet):
+    serializer_class = GroceryItemReferenceSerializer
+    queryset = GroceryItemReference.objects.all()
 
 class CurrentGroceryListViewSet(viewsets.ModelViewSet):
     # queryset = CurrentGroceryList.objects.all() # returns all grocery items regardless of user
@@ -12,7 +16,7 @@ class CurrentGroceryListViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return GroceryList.objects.filter(user_id=user.id)
-        # ORIGINAL return GroceryList.objects.filter(user_id=user.id).filter(is_current=True).order_by('aisle')
+        # return GroceryList.objects.filter(user_id=user.id).filter(is_current=True).order_by('aisle')
 
 class CurrentGroceryListItemsViewSet(viewsets.ModelViewSet):
     serializer_class = CurrentGroceryListItemsSerializer
@@ -22,8 +26,8 @@ class CurrentGroceryListItemsViewSet(viewsets.ModelViewSet):
 class CurrentGroceryListAndItemsViewSet(viewsets.ModelViewSet):
     serializer_class = CurrentGroceryListAndItemsSerializer
     queryset = GroceryListItems.objects.all()
-    filter_backends = [DjangoFilterBackend]
-    filterset_fields = ['id']
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('id',)
 
     # override base QuerySet to filter GroceryList records on current user
     def get_queryset(self):
