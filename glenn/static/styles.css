@@ -41,6 +41,44 @@ body {
     border: 1px solid black; 
 } */
 
+/* list-choice contains new-list and list-select */
+.list-choice {
+    display: flex;   /* automatically defaults to flex row */
+    justify-content: left;
+    /* border: 1px solid blue; */
+    width: 75vw;    /* 75% of view width */
+}
+
+.new-list {
+    display: flex;
+    /* gap: 10px; */
+    justify-content: space-around;
+    /* border: 1px solid green; */
+}
+
+/* list-select contains or and drop-down */
+.list-select {
+    display: flex;
+    /* gap: 10px;  */
+    justify-content: space-around;
+    /* border: 1px solid orange; */
+    width: 30vw;
+}
+
+.or {
+    display: flex;
+    gap: 10px;
+    justify-content: space-around;
+    /* border: 1px solid green; */
+}
+
+.drop-down {
+    display: flex;
+    gap: 10px;
+    justify-content: space-around;
+    /* border: 1px solid green; */
+}
+
 .item-row {
     display: flex;   /* automatically defaults to flex row */
     justify-content: left;
@@ -62,6 +100,19 @@ body {
     /* border: 1px solid orange; */
 }
 
+.complete {
+    text-decoration: line-through;
+}
+
+#aisle {
+    color: grey;
+}
+
 /* ul {
     border: 1px solid green;
 } */
+
+/* li {
+    list-style-type: none;
+} */
+

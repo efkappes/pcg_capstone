@@ -31,35 +31,58 @@
     <main>
         {% csrf_token %}
         <div id="app">
-            <div v-if="Object.keys(list_options).length">
-                <div>
-                    <select v-model="selectedList" @change="loadGroceryList(selectedList)" name="list_id">
-                        <option v-for="option in options" :value="option.id">[[ option.list_name ]]</option>
-                    </select>
-                    {% comment %} <button @click="loadList(selectedList)">Get List</button> {% endcomment %}
-                </div> 
+            <br>
+            <div class="list-choice">
+                <div class="new-list">
+                    <ul>
+                        <input type="text" placeholder="New List Name" v-model="newGroceryList.list_name">
+                        <button @click="addGroceryList">Create List</button>
+                    </ul>
+                </div>
+                {% comment %} <div class="or">
+                    <ul>- OR -</ul>
+                </div> {% endcomment %}
+                <div class="list-select" v-if="Object.keys(list_options).length">
+                    <ul>
+                        <div class="or">
+                            <span>- OR -</span>
+                        </div>
+                    </ul>
+                    <ul>
+                        <div class="drop-down">
+                            <span>Select an existing list: </span>
+                            <select v-model="selectedList" @change="loadGroceryList(selectedList)" name="list_id">
+                                <option v-for="option in options" :value="option.id">[[ option.list_name ]]</option>
+                            </select>
+                            {% comment %} <button @click="loadList(selectedList)">Get List</button> {% endcomment %}
+                        </div> 
+                    </ul>
+                </div>
             </div>
-            <div class="new-list">
-                <input type="text" placeholder="List Name" v-model="newGroceryList.list_name">
-                <button @click="addGroceryList">Create List</button>
-                {% comment %} <add-new-list @add-new-list="addGroceryList"></add-new-list> {% endcomment %}
-            </div>
+            {% comment %} <p><strong>- OR -</strong></p> {% endcomment %}
+                {% comment %} <br> {% endcomment %}
+            {% comment %} <input type="text" placeholder="New List Name" v-model="newGroceryList.list_name"> {% endcomment %}
+            {% comment %} <button @click="addGroceryList">Create List</button> {% endcomment %}
+                    {% comment %} <add-new-list @add-new-list="addGroceryList"></add-new-list> {% endcomment %}
+            <br>
             <div class="add-item">
                 <input type="text" placeholder="Item" v-model="newGroceryItem.item_name">
                 <input type="text" placeholder="Note" v-model="newGroceryItem.item_note">
                 {% comment %} <input type="checkbox" name="usual" v-model="newGroceryItem.usual">
                 <label for="usual">{{ Usual }}</label> {% endcomment %}
-                <button @click="addGroceryListItem">Add Item</button>
+                <button @click="addGroceryListItem">Add Item To List</button>
             </div>
+            <br><hr><br>
             <div class="list">
                 {% comment %} <ul v-if="Object.keys(grocery_list).length"> {% endcomment %}
-                {% comment %} <div v-if="Object.keys(data).length">
-                    <p>List Name Goes Here</p>
-                    <p>[[ data.list_name ]]</p>
-                </div> {% endcomment %}
+                {% comment %} <div v-if="Object.keys(data).length"> {% endcomment %}
+                {% comment %} <div> {% endcomment %}
+                    {% comment %} <p>[[ option.list_name ]]</p> {% endcomment %}
+                    {% comment %} <p>[[ data.list_name ]]</p> {% endcomment %}
+                {% comment %} </div> {% endcomment %}
                 {% comment %} <div v-if="Object.keys(grocery_list).length"> {% endcomment %}
                 <div v-if="Object.keys(grocery_list).length">
-                        <div>
+                    <div>
                         <grocery-item
                             v-for="item in incompleteItems"
                             :key="item.id"
@@ -71,7 +94,7 @@
                     </div>
                     <br><hr><br>
                     <div>
-                        <grocery-item
+                        <grocery-item class="complete"
                             v-for="item in completeItems"
                             :key="item.id"
                             @toggle="toggleGroceryItem($event)"
@@ -80,7 +103,6 @@
                             @remove="removeGroceryItem($event)"
                         ></grocery-item>                
                     </div>                
-                    <br><hr><br>
                     {% comment %} <add-favorite-list @add-fave-list="addFaveListContent(grocery_list)"></add-favorite-list> {% endcomment %}
                 </div>
             </div> 
@@ -105,7 +127,7 @@
                     <ul>Left3</ul>
                     <ul>Right3</ul>
                 </div>
-            </div>  {% endcomment %}
+            </div> {% endcomment %}
         </div> 
     </main>
     <script src="https://cdn.jsdelivr.net/npm/vue@2/dist/vue.js"></script>
@@ -113,4 +135,3 @@
     <script src="{% static '/app.js' %}"></script>
 </body>
 </html>
-

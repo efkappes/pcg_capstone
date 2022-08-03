@@ -6,7 +6,7 @@ Vue.component('grocery-item', {
     },
     props: ['item', 'item_info'],
     template: `
-        <li>
+        <div>
             <div v-if="editMode">
                 <input type="text" v-model="item.item_name">
                 <input type="text" v-model="item.item_note">
@@ -15,7 +15,7 @@ Vue.component('grocery-item', {
             <div v-else>
                 <div class='item-row'>
                     <div class='item-row-left'>
-                        <ul>(aisle {{ item.aisle }})</ul>
+                        <ul id='aisle'>aisle {{ item.aisle }}</ul>
                         <ul><input type="checkbox" v-model="item.complete" @click="toggleGroceryItem(item)"></ul>
                         <ul>{{ item.item_name }}</ul>
                     </div>
@@ -26,7 +26,7 @@ Vue.component('grocery-item', {
                     </div>
                 </div>
             </div>  
-        </li>
+        </div>
     `,
     methods: {
         saveGroceryItem: function(item) {
@@ -120,18 +120,15 @@ const vm = new Vue({
         filter_listid: null
     },
     methods: {
-        // this method returns all the items and list info for a *specific* grocery list for the current user
-        // loadGroceryList: function(filter_listid) {   KEEP COMMENTED OUT...OLDER
-        loadGroceryList: function(list_id) {  //PUT THIS BACK IN 
+        // this method returns item and list info for a *specific* grocery list of the current user
         // loadGroceryList: function() {       ***** TEST *****
                 // console.log('inside loadGroceryList, listid input parm: ', listid)  KEEP COMMENTED OUT
-            // REPLACE filter_listid WITH list_id ****** TEST ******
 
+        loadGroceryList: function(list_id) {  
             axios({
                 method: 'get',
-                // url: `api/v1/grocery_list_and_items/${filter_listid}/`      KEEP COMMENTED OUT     
-                url: `api/v1/grocery_list_and_items/${list_id}/`       //PUT THIS BACK IN
                 // url: 'api/v1/grocery_list_and_items/'         ***** TEST *****
+                url: `api/v1/grocery_list_and_items/${list_id}/`   
             }).then(response => {
                 this.grocery_list = response.data
                 this.list_id = response.data.id
@@ -143,7 +140,7 @@ const vm = new Vue({
                 console.log(error.response_data)
             })
         },
-        // this method returns all the items and list info for *all* the lists for the current user
+        // this method returns item and list info for *all* the lists of the current user
         loadLists: function() {
             axios({
                 method: 'get',
@@ -171,15 +168,6 @@ const vm = new Vue({
                     'X-CSRFToken': this.csrfToken
                 },
                 data: item
-                // data: {
-                //     "id": item.id,
-                //     "list_id": item.list_id,
-                //     "item_name": item.item_name,                                    
-                //     "aisle": item.aisle,                            
-                //     "usual": item.usual,                            
-                //     "item_note": item.item_note,                            
-                //     "complete": item.complete                            
-                // }
             }).then(response => {
                 this.loadGroceryList(this.list_id)
             })
