@@ -25,7 +25,7 @@ Vue.component('grocery-item', {
                         </div>
                         <div class='action-buttons'>
                             <ul>
-                                <button @click="editMode=true">Edit</button>
+                                <button @click="editMode=true">&#x270E;</button>
                                 <button @click="removeGroceryItem(item)">×</button>
                             </ul>
                         </div>
@@ -95,6 +95,7 @@ const vm = new Vue({
                 this.grocery_list = response.data
                 this.list_id = response.data.id
                 this.show_item_add = true
+                this.selectedList = ""
                 console.log('loadGroceryList response.data: ', response.data)
                 // console.log('loadGroceryList this.grocery_list: ', this.grocery_list)
                 // console.log('loadGroceryList this.list_id: ', this.list_id)
@@ -209,6 +210,7 @@ const vm = new Vue({
                     }
                 }).then(response => {
                     this.loadGroceryList(this.list_id)
+                    this.newGroceryList.list_name = ""
                     this.newGroceryItem = {
                         "item_name": "",
                         "usual": false,
@@ -238,6 +240,7 @@ const vm = new Vue({
             }
 
             return incompleteItems
+            // return incompleteItems.sort(this.grocery_list.aisle)
         }, 
         completeItems: function() {
             // console.log('inside completeItems')
@@ -253,6 +256,7 @@ const vm = new Vue({
             }
 
             return completeItems
+            // return completeItems.sort(this.grocery_list.aisle)
         },
         options: function() {
             // loadLists runs on created and returns all grocery lists into list_options for the logged in user.

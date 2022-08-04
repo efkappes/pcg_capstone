@@ -28,6 +28,11 @@ body {
     padding: 1em;
 }
 
+span {
+    display: table-cell;
+    vertical-align: middle;
+}
+
 .title {
     display: flex;
     padding-left: 1em;

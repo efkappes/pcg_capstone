@@ -37,8 +37,8 @@ class GroceryListItems(models.Model):
     def __str__(self):
         return self.list_id
 
-    # class Meta:
-    #     ordering = ['aisle']
+    class Meta:
+        ordering = ['aisle']
 
 class UsualGroceryItem(models.Model):
     user_id = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)

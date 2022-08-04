@@ -18,7 +18,7 @@ class CurrentGroceryListViewSet(viewsets.ModelViewSet):
     def get_queryset(self):
         user = self.request.user
         return GroceryList.objects.filter(user_id=user.id)
-        # return GroceryList.objects.filter(user_id=user.id).filter(is_current=True).order_by('aisle')
+        # return GroceryList.objects.filter(user_id=user.id).filter(is_current=True)
 
 class CurrentGroceryListItemsViewSet(viewsets.ModelViewSet):
     serializer_class = CurrentGroceryListItemsSerializer
