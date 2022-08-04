@@ -9,7 +9,6 @@ class GroceryItemReferenceSerializer(serializers.ModelSerializer):
     class Meta:
         model = GroceryItemReference
         fields = ('id', 'item_name', 'aisle')
-        # fields = ('id', 'item_name', 'aisle')
 
 class NestedGroceryListSerializer(serializers.ModelSerializer):
     class Meta:

@@ -7,6 +7,8 @@ from .serializers import GroceryItemReferenceSerializer, CurrentGroceryListSeria
 class GroceryItemReferenceViewSet(viewsets.ModelViewSet):
     serializer_class = GroceryItemReferenceSerializer
     queryset = GroceryItemReference.objects.all()
+    filter_backends = (DjangoFilterBackend,)
+    filterset_fields = ('item_name',)
 
 class CurrentGroceryListViewSet(viewsets.ModelViewSet):
     # queryset = CurrentGroceryList.objects.all() # returns all grocery items regardless of user
@@ -32,7 +34,8 @@ class CurrentGroceryListAndItemsViewSet(viewsets.ModelViewSet):
     # override base QuerySet to filter GroceryList records on current user
     def get_queryset(self):
         user = self.request.user
-        return GroceryList.objects.filter(user_id=user.id).filter(is_current=True)
+        return GroceryList.objects.filter(user_id=user.id)
+        # return GroceryList.objects.filter(user_id=user.id).filter(is_current=True)
         # return GroceryList.objects.filter(user_id=user.id).filter(is_current=True).order_by('aisle')
 
 class CurrentUserView(generics.RetrieveAPIView):

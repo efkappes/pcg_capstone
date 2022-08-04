@@ -19,7 +19,6 @@
         </div>
         <ul>
             {% if user.is_authenticated %}
-            {% comment %} <h3>Welcome to the GLENN grocery list app, {{ user.username }}!</h3> {% endcomment %}
             <h5>Hello {{ user.username }}!</h5>
             <p><a href="{% url 'logout' %}">Logout</a><p>
             {% else %}
@@ -39,9 +38,6 @@
                         <button @click="addGroceryList">Create List</button>
                     </ul>
                 </div>
-                {% comment %} <div class="or">
-                    <ul>- OR -</ul>
-                </div> {% endcomment %}
                 <div class="list-select" v-if="Object.keys(list_options).length">
                     <ul>
                         <div class="or">
@@ -59,13 +55,9 @@
                     </ul>
                 </div>
             </div>
-            {% comment %} <p><strong>- OR -</strong></p> {% endcomment %}
-                {% comment %} <br> {% endcomment %}
-            {% comment %} <input type="text" placeholder="New List Name" v-model="newGroceryList.list_name"> {% endcomment %}
-            {% comment %} <button @click="addGroceryList">Create List</button> {% endcomment %}
                     {% comment %} <add-new-list @add-new-list="addGroceryList"></add-new-list> {% endcomment %}
             <br>
-            <div class="add-item">
+            <div class="add-item" v-show="show_item_add">
                 <input type="text" placeholder="Item" v-model="newGroceryItem.item_name">
                 <input type="text" placeholder="Note" v-model="newGroceryItem.item_note">
                 {% comment %} <input type="checkbox" name="usual" v-model="newGroceryItem.usual">
@@ -74,14 +66,10 @@
             </div>
             <br><hr><br>
             <div class="list">
-                {% comment %} <ul v-if="Object.keys(grocery_list).length"> {% endcomment %}
-                {% comment %} <div v-if="Object.keys(data).length"> {% endcomment %}
-                {% comment %} <div> {% endcomment %}
-                    {% comment %} <p>[[ option.list_name ]]</p> {% endcomment %}
-                    {% comment %} <p>[[ data.list_name ]]</p> {% endcomment %}
-                {% comment %} </div> {% endcomment %}
-                {% comment %} <div v-if="Object.keys(grocery_list).length"> {% endcomment %}
                 <div v-if="Object.keys(grocery_list).length">
+                    <div v-if="grocery_list.list_name">
+                            <p>[[ grocery_list.list_name ]]</p>
+                    </div>
                     <div>
                         <grocery-item
                             v-for="item in incompleteItems"
@@ -103,16 +91,8 @@
                             @remove="removeGroceryItem($event)"
                         ></grocery-item>                
                     </div>                
-                    {% comment %} <add-favorite-list @add-fave-list="addFaveListContent(grocery_list)"></add-favorite-list> {% endcomment %}
                 </div>
             </div> 
-            {% comment %} <div class="favorite-list">
-                <favorite-list
-                    v-for="list in faveLists"
-                    :key="list.id"
-                    @detail="viewFavoriteGroceryItems(list)"
-                ></favorite-list>
-            </div> {% endcomment %}
 
             {% comment %} <div class="item-list">
                 <div class="item-row">

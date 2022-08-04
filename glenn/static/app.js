@@ -4,7 +4,7 @@ Vue.component('grocery-item', {
             editMode: false
         }
     },
-    props: ['item', 'item_info'],
+    props: ['item', 'item_info', 'list_name'],
     template: `
         <div>
             <div v-if="editMode">
@@ -20,9 +20,15 @@ Vue.component('grocery-item', {
                         <ul>{{ item.item_name }}</ul>
                     </div>
                     <div class='item-row-right'>
-                        <ul><em>({{ item.item_note }})</em></ul>
-                        <ul><button @click="editMode=true">Edit</button></ul>
-                        <ul><button @click="removeGroceryItem(item)">×</button></ul>
+                        <div v-if=item.item_note>
+                            <ul id='note'><em>{{ item.item_note }}</em></ul>
+                        </div>
+                        <div class='action-buttons'>
+                            <ul>
+                                <button @click="editMode=true">Edit</button>
+                                <button @click="removeGroceryItem(item)">×</button>
+                            </ul>
+                        </div>
                     </div>
                 </div>
             </div>  
@@ -44,53 +50,13 @@ Vue.component('grocery-item', {
 })
 
 
-// Vue.component('add-favorite-list', {
-//     data: function() {
-//         return {
-//             list_name: "",
-//         }
-//     },
-//     props: ['grocery_list'],
-//     template: `
-//         <div>
-//             <input type="text" placeholder="List Name" v-model="list_name">
-//             <button @click="addFaveListContent">Add List to Favorites</button>
-//         </div>
-//     `,
-//     methods: {
-//         addFaveListContent: function() {
-//             this.$emit('add-fave-list', this.grocery_list)
-//         }
-//     }
-// })
-
-
-// Vue.component('favorite-list', {
-//     data: function() {
-//         return {
-//             list_name: "",
-//         }
-//     },
-//     props: ['favorite_list'],
-//     template: `
-//         <div>
-//             <input type="text" placeholder="List Name" v-model="list_name">
-//             <button @click="addFavoriteList">Add List to Favorites</button>
-//         </div>
-//     `,
-//     methods: {
-//         addFavoriteList: function(grocery_list) {
-//             this.$emit('add-fave-list', grocery_list)
-//         }
-//     }
-// })
-
-
 const vm = new Vue({
     el: "#app",
     delimiters: ['[[',']]'],
     data: {
         csrfToken: "",
+        show_item_add: false,
+        show_list_name: false,
         data: [],
         grocery_list: [],
         list_options: [],
@@ -121,20 +87,17 @@ const vm = new Vue({
     },
     methods: {
         // this method returns item and list info for a *specific* grocery list of the current user
-        // loadGroceryList: function() {       ***** TEST *****
-                // console.log('inside loadGroceryList, listid input parm: ', listid)  KEEP COMMENTED OUT
-
         loadGroceryList: function(list_id) {  
             axios({
                 method: 'get',
-                // url: 'api/v1/grocery_list_and_items/'         ***** TEST *****
                 url: `api/v1/grocery_list_and_items/${list_id}/`   
             }).then(response => {
                 this.grocery_list = response.data
                 this.list_id = response.data.id
+                this.show_item_add = true
                 console.log('loadGroceryList response.data: ', response.data)
-                console.log('loadGroceryList this.grocery_list: ', this.grocery_list)
-                console.log('loadGroceryList this.list_id: ', this.list_id)
+                // console.log('loadGroceryList this.grocery_list: ', this.grocery_list)
+                // console.log('loadGroceryList this.list_id: ', this.list_id)
             }).catch(error => {
                 console.log(error)
                 console.log(error.response_data)
@@ -144,7 +107,8 @@ const vm = new Vue({
         loadLists: function() {
             axios({
                 method: 'get',
-                url: 'api/v1/grocery_list_and_items/'               
+                url: 'api/v1/grocery_list/'               
+                // url: 'api/v1/grocery_list_and_items/'               
             }).then(response => {
                 this.list_options = response.data
                 console.log(response.data)
@@ -184,8 +148,6 @@ const vm = new Vue({
             })
         },
         toggleGroceryItem: function(item) {
-            console.log('inside toggleGroceryItem, item.complete: ' + item.complete)
-            console.log('inside toggleGroceryItem, this.item.complete: ' + this.item.complete)
             item.complete = !item.complete
         },
         addGroceryList: function() {
@@ -206,71 +168,66 @@ const vm = new Vue({
             }).then(response => {
                 this.list_id = response.data.id
                 this.list_name = response.data.list_name
+                this.show_item_add = true
                 this.loadLists()
+                // reset grocery_list so that it doesn't hold old data; this handles the case where a user
+                // selects an existing list from the drop-down but then creates a new list and hasn't added 
+                // any items yet
+                this.grocery_list = []  
                 // this.loadGroceryList()
             })            
         },
         addGroceryListItem: function(list_id) {
-            // item_name = this.newGroceryItem.item_name
+            item_name = this.newGroceryItem.item_name
 
-            //first look up aisle info for the given item name, then add item to grocery list
-            // axios({
-            //     method: 'get',
-            //     url: `api/v1/aisle_info/${item_name}/`               
-            // }).then(response => {
-            //     this.aisle = response.data.aisle
-            //     console.log(response.data)
-            //     console.log(this.aisle)
-            // }).catch(error => {
-            //     console.log(error)
-            //     console.log(error.response_data)
-            // }).then
+            // look up aisle info for the given item name before adding item to the list
             axios({
-                method: 'post',
-                url: 'api/v1/grocery_list_items/',
-                headers: {
-                    'X-CSRFToken': this.csrfToken
-                },
-                data: {
-                    "list_id": this.list_id,
-                    "item_name": this.newGroceryItem.item_name,                                    
-                    "aisle": this.aisle,                            
-                    "usual": this.newGroceryItem.usual,                            
-                    "item_note": this.newGroceryItem.item_note,                            
-                    "complete": this.newGroceryItem.complete                            
-                }
+                method: 'get',
+                url: 'api/v1/aisle_info/',
+                params: {
+                    "item_name": item_name
+                }           
             }).then(response => {
-                this.loadGroceryList(this.list_id)
-                this.newGroceryItem = {
-                    "item_name": "",
-                    "usual": false,
-                    "item_note": "",
-                    "complete": false
+                if (response.data[0]) {
+                    this.aisle = response.data[0].aisle                
+                } else {
+                    this.aisle = 0
                 }
-            })            
+                axios({
+                    method: 'post',
+                    url: 'api/v1/grocery_list_items/',
+                    headers: {
+                        'X-CSRFToken': this.csrfToken
+                    },
+                    data: {
+                        "list_id": this.list_id,
+                        "item_name": this.newGroceryItem.item_name,                                    
+                        "aisle": this.aisle,                            
+                        "usual": this.newGroceryItem.usual,                            
+                        "item_note": this.newGroceryItem.item_note,                            
+                        "complete": this.newGroceryItem.complete                            
+                    }
+                }).then(response => {
+                    this.loadGroceryList(this.list_id)
+                    this.newGroceryItem = {
+                        "item_name": "",
+                        "usual": false,
+                        "item_note": "",
+                        "complete": false
+                    }
+                }) 
+            }).catch(error => {
+                console.log(error)
+                console.log(error.response_data)
+            })
         }
     },
     computed: {
         incompleteItems: function() {
-            console.log('inside incompleteItems')
-            console.log('inside incompleteItems, this.grocery_list: ', this.grocery_list)
-            console.log('inside incompleteItems, this.list_id: ', this.list_id)
-            console.log('inside incompleteItems, this.grocery_list.length: ', this.grocery_list.length)
+            // console.log('inside incompleteItems, this.grocery_list: ', this.grocery_list)
+            // console.log('inside incompleteItems, this.list_id: ', this.list_id)
 
             let incompleteItems = []
-            // for (let i=0; i < this.grocery_list.length; i++) {  
-            //     // console.log('inside incompleteItems, this.grocery_list[i].id: ', this.grocery_list[i].id)
-            //     if (this.grocery_list[i].id==this.list_id) {    
-            //             // console.log('inside incompleteItems outer loop, this.grocery_list[i].id: ', this.grocery_list[i].id)
-            //             for (let j=0; j < this.grocery_list[i].item_info.length; j++)  {
-            //             if (!this.grocery_list[i].item_info[j].complete) {
-            //                 // console.log('incomplete grocery item: ', this.grocery_list[i].item_info[j])
-            //                 incompleteItems.push(this.grocery_list[i].item_info[j])
-            //             }
-            //         }
-            //     }
-            // }
-                // console.log('inside incompleteItems, this.grocery_list[i].id: ', this.grocery_list[i].id)
 
             if (this.grocery_list.id==this.list_id) {    
                 for (let j=0; j < this.grocery_list.item_info.length; j++)  {
@@ -281,25 +238,11 @@ const vm = new Vue({
             }
 
             return incompleteItems
-
-            // return this.grocery_list.filter(function(item_info) {
-            //     return !item_info.complete
-            // })
         }, 
         completeItems: function() {
-            console.log('inside completeItems')
+            // console.log('inside completeItems')
 
             let completeItems = []
-            // for (let i=0; i < this.grocery_list.length; i++) {
-            //     if (this.grocery_list[i].id==this.list_id) {
-            //             for (let j=0; j < this.grocery_list[i].item_info.length; j++)  {
-            //             if (this.grocery_list[i].item_info[j].complete) {
-            //                 // console.log('completed grocery item: ', this.grocery_list[i].item_info[j])
-            //                 completeItems.push(this.grocery_list[i].item_info[j])
-            //             }
-            //         }
-            //     }
-            // }
 
             if (this.grocery_list.id==this.list_id) {    
                 for (let j=0; j < this.grocery_list.item_info.length; j++)  {
@@ -310,10 +253,6 @@ const vm = new Vue({
             }
 
             return completeItems
-
-            // return this.grocery_list.filter(function(item) {
-            //     return item.complete
-            // })
         },
         options: function() {
             // loadLists runs on created and returns all grocery lists into list_options for the logged in user.
@@ -321,7 +260,6 @@ const vm = new Vue({
 
             let options = []
             for (let i=0; i < this.list_options.length; i++) {
-                // options.push(this.list_options[i].id, this.list_options[i].list_name)
                 options.push({id: this.list_options[i].id, list_name: this.list_options[i].list_name})
             }
             console.log('options: ', options)
