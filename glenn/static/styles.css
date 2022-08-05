@@ -17,7 +17,8 @@ header {
     color: white;
     /* border: 3px solid #C0D904; */
     border-radius: 5px;
-    padding: .1em .5em;
+    /* padding: .1em .5em; */
+    padding: .1em .3em;
 }
 
 body {
@@ -36,22 +37,15 @@ span {
 .title {
     display: flex;
     padding-left: 1em;
-    /* font-size: 20vh; */
+    font-size: 20px;
     /* border: 1px solid black; */
 }
-
-/* .item-list {
-    border: 1px solid black; 
-} */
-
-/* .list {
-    border: 1px solid black; 
-} */
 
 /* list-choice contains new-list and list-select */
 .list-choice {
     display: flex;   /* automatically defaults to flex row */
     justify-content: left;
+    align-items: center;
     /* border: 1px solid blue; */
     width: 75vw;    /* 75% of view width */
 }
@@ -59,6 +53,7 @@ span {
 .new-list {
     display: flex;
     /* gap: 10px; */
+    align-items: center;
     justify-content: space-around;
     /* border: 1px solid green; */
 }
@@ -66,6 +61,7 @@ span {
 /* list-select contains or and drop-down */
 .list-select {
     display: flex;
+    align-items: center;
     /* gap: 10px;  */
     justify-content: space-around;
     /* border: 1px solid orange; */
@@ -82,8 +78,17 @@ span {
 .drop-down {
     display: flex;
     gap: 10px;
+    align-items: center;
     justify-content: space-around;
     /* border: 1px solid green; */
+}
+
+.drop-down-label {
+    align-items: center;
+}
+
+.drop-down-box {
+    align-items: center;
 }
 
 .item-row {
@@ -95,7 +100,7 @@ span {
 
 .item-row-left {
     display: flex;
-    /* min-width: 30rem;    MAYBE PUT THIS BACK*/
+    /* min-width: 30rem; */
     /* gap: 10px; */
     /* justify-content: flex-end; */
     /* justify-content: space-around; */
@@ -104,7 +109,7 @@ span {
 
 .item-row-right {
     display: flex;
-    /* min-width: 25rem;    MAYBE PUT THIS BACK */
+    /* min-width: 25rem;  */
     /* gap: 10px;  */
     justify-content: space-around;
     /* border: 1px solid orange; */
